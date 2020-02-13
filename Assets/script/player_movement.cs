@@ -26,7 +26,7 @@ public class player_movement : MonoBehaviour {
     public float axisY;
     public float pre_y;
     public bool isJumping;
-    public float jumpforce = 300.0f;
+    public float jumpforce = 200.0f;
     float temp_gap_y;
     Vector3 jump_stop;
     public bool isJumpkick=false;
@@ -40,7 +40,6 @@ public class player_movement : MonoBehaviour {
     public int shake=0;
     public bool shaking;
     public int punch=0;
-    public int hit_combo = 0;
     public attack hit_attack;
 
 
@@ -181,29 +180,30 @@ public class player_movement : MonoBehaviour {
             //_Player_sprite.flipX = true;
             transform.localScale = new Vector3(-1, 1, 1);
         }
-        if(isJumping == true && temp_gap_y < 0.0f && transform.position.y <= axisY + 1.3f)
+        if(isJumping == true && transform.position.y < 3.2f && transform.position.y >= 3.1f)
         {
             n_animator.SetInteger("Jump", 2);
         }
-        if (isJumping == true && transform.position.y <= axisY+0.01f )
+        if (isJumping == true && transform.position.y <= 1.80f )
         {
             OnLanding();
  
         }
 
         if (isJumping == true) {
-            temp_gap_y = transform.position.y - pre_y;
-            pre_y = transform.position.y;
+            //temp_gap_y = transform.position.y - pre_y;
+           // pre_y = transform.position.y;
 
         }
         if (Input.GetKey(KeyCode.Space)&& !isJumping)
         {
             axisY = transform.position.y;
             isJumping = true;
-            
-           // rigidbody_j.useGravity = 1.5f;
-          //  rigidbody_j.WakeUp();
-            rigidbody_j.AddForce(new Vector2(transform.position.x+100.0f*x_input, jumpforce));
+
+            // rigidbody_j.useGravity = 1.5f;
+            //  rigidbody_j.WakeUp();
+            //      rigidbody_j.AddForce(new Vector3(transform.position.x+100.0f*x_input, jumpforce,transform.position.z));
+            rigidbody_j.AddForce(transform.up* jumpforce);
 
             n_animator.SetInteger("Jump", 1);
         }
@@ -213,27 +213,12 @@ public class player_movement : MonoBehaviour {
     void OnLanding()
     {
         isJumping = false;
-//        rigidbody_j.gravityScale = 0.0f;
-        rigidbody_j.Sleep();
-        transform.position = new Vector3(transform.position.x, axisY, transform.position.z);
         n_animator.SetInteger("Jump", 0);
-        temp_gap_y = 0;
-        pre_y = 0;
+//        temp_gap_y = 0;
+//        pre_y = 0;
 
     }
-    bool IsGrounded()
-    {
-
-        RaycastHit2D hitinfo = Physics2D.Raycast(transform.position, Vector2.down, 0.6f, 1 << 8);
-
-        if (hitinfo.collider != null)
-        {
-            if(_reset_jump==false)
-           return true;
-
-        }
-        return false;
-    }
+    
     IEnumerator Reset_Jump_R()
     {
         _reset_jump = true;
@@ -292,9 +277,6 @@ public class player_movement : MonoBehaviour {
     {
        // Debug.Log("attacking combo");
 
-        hit_combo++;
-        if (hit_combo >= 2)
-            hit_combo = 2;
 
         if (n_animator.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.99f && n_animator.GetCurrentAnimatorStateInfo(0).IsName("attack1") && !hit_attack.enemy_hit)
         {
